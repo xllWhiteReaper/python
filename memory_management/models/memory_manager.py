@@ -124,8 +124,11 @@ class MemoryManager:
                 json_stringify(queued_job)
                 try:
                     if elapsed_time >= int(queued_job.start_time) and queued_job.current_state == "Pending":
+                        # Add color green
                         print(
                             f"Job with id {queued_job.id} has started running")
+                        queued_job.current_state = "Running"
                 except:
+                    print("error")
                     return
             #         queued_job.current_state = "Running"
