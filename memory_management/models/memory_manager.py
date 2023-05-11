@@ -7,7 +7,7 @@ from typing import Union
 from models.job import Job
 from models.page_table import PageTable
 from utils.deallocate_memory import deallocate_memory
-from utils.search_for_available_space import search_for_best_location
+from utils.search_for_available_space import search_for_best_location, search_for_worst_location
 from utils.text_utils import print_centered_text,\
     print_separation, print_n_new_lines
 from utils.debugger import json_stringify
@@ -81,19 +81,23 @@ class MemoryManager:
         print(f"Started the process of queuing")
         print_n_new_lines()
         queue_list: list[None | Job] = [None for _ in range(NUMBER_OF_PAGES)]
+        # for i in range(NUMBER_OF_PAGES):
+        #     if i % 2 == 0:
+        #         queue_list[i] = Job("2", "1", "4", "3", "Sleep")
         queue_list[0] = Job("2", "1", "4", "3", "Sleep")
         # queue_list[1] = Job("2", "1", "4", "3", "End")
         # queue_list[2] = Job("2", "1", "4", "3", "End")
-        queue_list[4] = Job("2", "1", "4", "3", "End")
+        queue_list[5] = Job("2", "1", "4", "3", "End")
         queue_list[6] = Job("2", "1", "4", "3", "End")
+        queue_list[8] = Job("2", "1", "4", "3", "End")
         queue_list[10] = Job("2", "1", "4", "3", "End")
         queue_list[12] = Job("2", "1", "4", "3", "End")
         queue_list[14] = Job("2", "1", "4", "3", "End")
         queue_list[16] = Job("2", "1", "4", "3", "End")
         queue_list[18] = Job("2", "1", "4", "3", "End")
         jobs_list_copy = jobs_list[::]
-        print("Searching for best location")
-        print(f"Index: {search_for_best_location(queue_list, 2)}")
+        print("Searching for worst location")
+        print(f"Index: {search_for_worst_location(queue_list, 2)}")
         # for job in jobs_list_copy:
         # print("checking jobs")
         # while time_manager.get_elapsed_time() < 10:
