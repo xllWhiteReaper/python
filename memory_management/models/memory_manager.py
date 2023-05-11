@@ -7,6 +7,7 @@ from typing import Union
 from models.job import Job
 from models.page_table import PageTable
 from utils.deallocate_memory import deallocate_memory
+from utils.search_for_available_space import search_for_best_location
 from utils.text_utils import print_centered_text,\
     print_separation, print_n_new_lines
 from utils.debugger import json_stringify
@@ -79,32 +80,35 @@ class MemoryManager:
         print_n_new_lines()
         print(f"Started the process of queuing")
         print_n_new_lines()
-        queue_list = [None for _ in range(NUMBER_OF_PAGES)]
+        queue_list: list[None | Job] = [None for _ in range(NUMBER_OF_PAGES)]
         queue_list[0] = Job("2", "1", "4", "3", "Sleep")
         # queue_list[1] = Job("2", "1", "4", "3", "End")
-        # queue_list[2] = Job("2", "1", "4", "3", "End")
-        # queue_list[3] = Job("2", "1", "4", "3", "End")
-        # queue_list[4] = Job("2", "1", "4", "3", "End")
+        queue_list[2] = Job("2", "1", "4", "3", "End")
+        queue_list[4] = Job("2", "1", "4", "3", "End")
+        queue_list[6] = Job("2", "1", "4", "3", "End")
+        queue_list[9] = Job("2", "1", "4", "3", "End")
         jobs_list_copy = jobs_list[::]
+        print("Searching for best location")
+        print(f"Index: {search_for_best_location(queue_list, 2)}")
         # for job in jobs_list_copy:
-        print("checking jobs")
-        while time_manager.get_elapsed_time() < 10:
-            print_separation()
-            print(f"inside for loop")
-            # print(
-            #     f"Time since the start of the function: {curr_time()-start_time}")
-            # print("jobs_list")
-            # self.test()
-            self.check_jobs_in_memory_status(
-                queue_list, time_manager.get_elapsed_time())
-            time_manager.sleep(CHECKING_INTERVAL)
-            # print(job)
-        # while awaiting_jobs:
-        #     for job in jobs_list:
-        #         if job.current_state == "Pending":
-        #             pass
-        #         pass
-        print(queue_list)
+        # print("checking jobs")
+        # while time_manager.get_elapsed_time() < 10:
+        #     print_separation()
+        #     print(f"inside for loop")
+        #     # print(
+        #     #     f"Time since the start of the function: {curr_time()-start_time}")
+        #     # print("jobs_list")
+        #     # self.test()
+        #     self.check_jobs_in_memory_status(
+        #         queue_list, time_manager.get_elapsed_time())
+        #     time_manager.sleep(CHECKING_INTERVAL)
+        #     # print(job)
+        # # while awaiting_jobs:
+        # #     for job in jobs_list:
+        # #         if job.current_state == "Pending":
+        # #             pass
+        # #         pass
+        # print(queue_list)
 
     def test(self):
         print("HAHA")
