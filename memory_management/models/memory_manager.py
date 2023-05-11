@@ -83,10 +83,14 @@ class MemoryManager:
         queue_list: list[None | Job] = [None for _ in range(NUMBER_OF_PAGES)]
         queue_list[0] = Job("2", "1", "4", "3", "Sleep")
         # queue_list[1] = Job("2", "1", "4", "3", "End")
-        queue_list[2] = Job("2", "1", "4", "3", "End")
+        # queue_list[2] = Job("2", "1", "4", "3", "End")
         queue_list[4] = Job("2", "1", "4", "3", "End")
         queue_list[6] = Job("2", "1", "4", "3", "End")
-        queue_list[9] = Job("2", "1", "4", "3", "End")
+        queue_list[10] = Job("2", "1", "4", "3", "End")
+        queue_list[12] = Job("2", "1", "4", "3", "End")
+        queue_list[14] = Job("2", "1", "4", "3", "End")
+        queue_list[16] = Job("2", "1", "4", "3", "End")
+        queue_list[18] = Job("2", "1", "4", "3", "End")
         jobs_list_copy = jobs_list[::]
         print("Searching for best location")
         print(f"Index: {search_for_best_location(queue_list, 2)}")

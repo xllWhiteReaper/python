@@ -11,7 +11,9 @@ def search_for_available_space(queue_list: list[Job | None], queue_type: str, ta
 
 
 def search_for_best_location(queue_list: list[Job | None], target_memory: int) -> int:
+    queue_size = len(queue_list)
     counter: int = 0
+    first_index: int = -1
     index: int = -1
     possible_index: int = -1
     for idx, job_fragment in enumerate(queue_list):
@@ -22,7 +24,14 @@ def search_for_best_location(queue_list: list[Job | None], target_memory: int) -
             if counter == 1:
                 possible_index = idx
 
-            if counter == target_memory:
+            if counter == target_memory and first_index == -1:
+                first_index = possible_index
+
+            if counter == target_memory and idx == (queue_size - 1):
+                index = possible_index
+                break
+
+            if counter == target_memory and idx < (queue_size - 1) and queue_list[idx + 1] is not None:
                 index = possible_index
                 break
 
@@ -30,6 +39,10 @@ def search_for_best_location(queue_list: list[Job | None], target_memory: int) -
             counter = 0
             possible_index = -1
             continue
+    if index == -1 and first_index != -1:
+        # didn't find the most optimal index
+        return first_index
+
     return index
 
 
