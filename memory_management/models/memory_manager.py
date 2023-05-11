@@ -1,9 +1,12 @@
+from ast import Dict
 import csv
+import math
 import time
 
 from typing import Union
 from models.job import Job
 from models.page_table import PageTable
+from utils.deallocate_memory import deallocate_memory
 from utils.text_utils import print_centered_text,\
     print_separation, print_n_new_lines
 from utils.debugger import json_stringify
@@ -12,6 +15,7 @@ from utils.time_manager import TimeManager
 PAGE_SIZE = 1
 REAL_EXECUTION_TIME = 0.01
 TOTAL_MEMORY_SIZE = 20
+NUMBER_OF_PAGES = math.floor(TOTAL_MEMORY_SIZE/PAGE_SIZE)
 CHECKING_INTERVAL = 3
 MEMORY_DATA_PATHS = [
     "./first_list.csv",
@@ -23,6 +27,10 @@ class MemoryManager:
     def __init__(self) -> None:
         self.page_tables = []
         self.memory_data_list = [None for _ in MEMORY_DATA_PATHS]
+
+        self.memory_map: dict[str, PageTable] = {
+            "2": PageTable("2",  [0, 1, 2, 3])
+        }
 
     def get_jobs_from_file(self, file_name):
         print("GETTING JOBS FROM FILE")
@@ -71,8 +79,12 @@ class MemoryManager:
         print_n_new_lines()
         print(f"Started the process of queuing")
         print_n_new_lines()
-        queue_list = [None for _ in range(TOTAL_MEMORY_SIZE)]
-        queue_list[0] = Job("2", "1", "4", "3", "End")
+        queue_list = [None for _ in range(NUMBER_OF_PAGES)]
+        queue_list[0] = Job("2", "1", "4", "3", "Sleep")
+        # queue_list[1] = Job("2", "1", "4", "3", "End")
+        # queue_list[2] = Job("2", "1", "4", "3", "End")
+        # queue_list[3] = Job("2", "1", "4", "3", "End")
+        # queue_list[4] = Job("2", "1", "4", "3", "End")
         jobs_list_copy = jobs_list[::]
         # for job in jobs_list_copy:
         print("checking jobs")
@@ -115,20 +127,29 @@ class MemoryManager:
         except:
             return
 
-    def check_jobs_in_memory_status(self, queue_list: list[Union[Job, None]], elapsed_time: float) -> None:
+    def check_jobs_in_memory_status(self, queue_list: list[Job | None], elapsed_time: float) -> None:
         print("CHECKING JOBS INSIDE FUNCTION")
         for queued_job in queue_list:
             if queued_job is not None:
-                print(f"elapsed: {elapsed_time}")
-                print("stringify")
-                json_stringify(queued_job)
                 try:
                     if elapsed_time >= int(queued_job.start_time) and queued_job.current_state == "Pending":
                         # Add color green
                         print(
                             f"Job with id {queued_job.id} has started running")
                         queued_job.current_state = "Running"
+                    # Supposing that the csv schema is adequate and every task will start its
+                    # execution at the estated time
+                    elif elapsed_time >= int(queued_job.start_time) + int(queued_job.execution_interval):
+                        print(
+                            f"Job with id {queued_job.id} has finished its execution interval")
+                        queued_job.current_state = queued_job.state_after_interval
                 except:
-                    print("error")
                     return
-            #         queued_job.current_state = "Running"
+
+                if queued_job.current_state == "End":
+                    deallocate_memory(
+                        queue_list, self.memory_map, queued_job.id)
+
+                if queued_job.current_state == "Sleep":
+                    print(
+                        f"Job with id {queued_job.id} is sleeping")
