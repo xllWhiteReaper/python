@@ -128,9 +128,9 @@ class MemoryManager:
             return
 
     def check_jobs_in_memory_status(self, queue_list: list[Job | None], elapsed_time: float) -> None:
-        print("CHECKING JOBS INSIDE FUNCTION")
+        found_job_id: str = "-1"
         for queued_job in queue_list:
-            if queued_job is not None:
+            if queued_job is not None and queued_job.id != found_job_id:
                 try:
                     if elapsed_time >= int(queued_job.start_time) and queued_job.current_state == "Pending":
                         # Add color green
@@ -143,6 +143,8 @@ class MemoryManager:
                         print(
                             f"Job with id {queued_job.id} has finished its execution interval")
                         queued_job.current_state = queued_job.state_after_interval
+
+                    found_job_id = queued_job.id
                 except:
                     return
 
