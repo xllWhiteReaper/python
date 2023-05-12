@@ -6,6 +6,7 @@ from models.page_table import PageTable
 from utils.memory_handling.deallocate_memory import deallocate_memory
 from utils.memory_handling.free_table_values import free_table_values
 from utils.memory_handling.free_queue_list import free_queue_list
+from utils.memory_handling.free_memory_space import free_memory_space
 # from utils.search_for_available_space import search_for_available_space
 from utils.text_utils import print_centered_text,\
     print_separation, print_n_new_lines
@@ -28,7 +29,7 @@ class MemoryManager:
         self.page_tables = []
         self.memory_data_list = [None for _ in MEMORY_DATA_PATHS]
 
-        self.memory_maps: list[dict[str, PageTable | None]] = [{
+        self.memory_maps: list[dict[str, (PageTable | None)]] = [{
             "2": PageTable("2",  [0, 2, 3, 5]),
             "3": PageTable("3",  [6, 8, 10]),
             "4": PageTable("4",  [12, 14, 16, 18]),
@@ -87,8 +88,10 @@ class MemoryManager:
         #     if i % 2 == 0:
         #         queue_list[i] = Job("2", "1", "4", "3", "Sleep")
         queue_list[0] = JobFragment("2", "1", "4", "3", "Sleep")
+        queue_list[0].current_state = "Running"
         queue_list[2] = JobFragment("2", "1", "4", "3", "Sleep")
         queue_list[3] = JobFragment("2", "1", "4", "3", "Sleep")
+        queue_list[3].current_state = "Running"
         queue_list[5] = JobFragment("2", "1", "4", "3", "Sleep")
 
         queue_list[6] = JobFragment("3", "1", "4", "3", "Running")
@@ -111,12 +114,12 @@ class MemoryManager:
         print("ok")
         specific_list_table = self.memory_maps[list_number]
         # specific_list_table: PageTable = self.memory_maps[jobs_list]
-        free_table_values(
-            specific_list_table, [0, 2, 3, 5, 8, 14])
+        # free_table_values(
+        #     specific_list_table, [0, 2, 3, 5, 8, 14])
+        print(free_memory_space(queue_list, specific_list_table, 3))
         # free_queue_list(queue_list, [0, 2, 3])
         # JUST ERASES THE FIRST ITEM IN THE LIST
-        self.memory_maps[list_number] = {
-            key: value for key, value in self.memory_maps[list_number].items() if value is not None}
+        self.check_memory_maps(list_number)
 
         print("self.memory_maps")
         json_stringify(self.memory_maps)
@@ -148,6 +151,9 @@ class MemoryManager:
         # #             pass
         # #         pass
         # print(queue_list)
+    def check_memory_maps(self, list_number: int):
+        self.memory_maps[list_number] = {
+            key: value for key, value in self.memory_maps[list_number].items() if value is not None}
 
     def queue_first_fit_approach(self, jobs_list):
         pass
