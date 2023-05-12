@@ -1,7 +1,7 @@
-from models.job import Job
+from models.job_fragment import JobFragment
 
 
-def search_for_best_location(queue_list: list[Job | None], target_memory: int) -> int:
+def search_for_best_location(queue_list: list[JobFragment | None], target_memory: int) -> int:
     queue_size = len(queue_list)
     counter: int = 0
     first_index: int = -1

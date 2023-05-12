@@ -1,6 +1,6 @@
 import json
 from typing import Any
-from models.job import Job
+from models.job_fragment import JobFragment
 
 from models.page_table import PageTable
 
@@ -12,7 +12,7 @@ class CustomSerializer(json.JSONEncoder):
                 "memory_addresses": o.memory_addresses,
                 "job_id": o.job_id
             }
-        elif isinstance(o, Job):
+        elif isinstance(o, JobFragment):
             return {
                 "id": o.id,
                 "start_time": o.start_time,
@@ -21,7 +21,7 @@ class CustomSerializer(json.JSONEncoder):
                 "state_after_interval": o.state_after_interval,
                 "current_state": o.current_state
             }
-            # Add custom serializers here, before None 
+            # Add custom serializers here, before None
         elif isinstance(o, None):
             return ""
         return super().default(o)

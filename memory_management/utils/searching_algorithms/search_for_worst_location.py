@@ -1,8 +1,8 @@
 import math
-from models.job import Job
+from models.job_fragment import JobFragment
 
 
-def search_for_worst_location(queue_list: list[Job | None], target_memory: int) -> int:
+def search_for_worst_location(queue_list: list[JobFragment | None], target_memory: int) -> int:
     counter: int = 0
     index: int = -1
     possible_index: int = -1
