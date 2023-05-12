@@ -87,33 +87,46 @@ class MemoryManager:
         # for i in range(NUMBER_OF_PAGES):
         #     if i % 2 == 0:
         #         queue_list[i] = Job("2", "1", "4", "3", "Sleep")
-        job_to_add = JobFragment("2", "1", "6", "3", "Sleep")
+        job_to_add = JobFragment("5", "1", "6", "3", "Sleep")
+        allocation_size = int(math.floor(int(job_to_add.required_size))/2)
+
         queue_list[0] = JobFragment("2", "1", "4", "3", "Sleep")
-        queue_list[0].current_state = "Running"
-        queue_list[2] = JobFragment("2", "1", "4", "3", "Sleep")
-        queue_list[2].current_state = "Running"
-        queue_list[3] = JobFragment("2", "1", "4", "3", "Sleep")
-        queue_list[3].current_state = "Running"
-        queue_list[4] = JobFragment("2", "1", "4", "3", "Sleep")
-        queue_list[4].current_state = "Running"
-        queue_list[5] = JobFragment("2", "1", "4", "3", "Sleep")
-        queue_list[5].current_state = "Pending"
+        # queue_list[0].current_state = "Running"
+        # queue_list[2] = JobFragment("2", "1", "4", "3", "Sleep")
+        # queue_list[2].current_state = "Running"
+        # queue_list[3] = JobFragment("2", "1", "4", "3", "Sleep")
+        # queue_list[3].current_state = "Running"
+        # queue_list[4] = JobFragment("2", "1", "4", "3", "Sleep")
+        # queue_list[4].current_state = "Running"
+        # queue_list[5] = JobFragment("2", "1", "4", "3", "Sleep")
+        # queue_list[5].current_state = "Pending"
 
         queue_list[6] = JobFragment("3", "1", "4", "3", "Running")
-        queue_list[6].current_state = "Pending"
+        # queue_list[6].current_state = "Pending"
 
-        queue_list[7] = JobFragment("5", "1", "8", "3", "Running")
-        queue_list[7].current_state = "Pending"
+        # queue_list[7] = JobFragment("5", "1", "8", "3", "Running")
+        # queue_list[7].current_state = "Pending"
 
-        queue_list[8] = JobFragment("3", "1", "4", "3", "Running")
-        queue_list[10] = JobFragment("3", "1", "4", "3", "Running")
+        # queue_list[8] = JobFragment("3", "1", "4", "3", "Running")
+        # queue_list[10] = JobFragment("3", "1", "4", "3", "Running")
 
-        queue_list[12] = JobFragment("4", "1", "4", "3", "Sleep")
-        queue_list[14] = JobFragment("4", "1", "4", "3", "Sleep")
-        queue_list[16] = JobFragment("4", "1", "4", "3", "Sleep")
-        queue_list[18] = JobFragment("4", "1", "4", "3", "Sleep")
+        # queue_list[12] = JobFragment("4", "1", "4", "3", "Sleep")
+        # queue_list[14] = JobFragment("4", "1", "4", "3", "Sleep")
+        # queue_list[16] = JobFragment("4", "1", "4", "3", "Sleep")
+        # queue_list[18] = JobFragment("4", "1", "4", "3", "Sleep")
+        print("Before allocating memory")
+        print("queue_list")
+        json_stringify(queue_list)
+        print("self.memory_maps[list_number]")
+        json_stringify(self.memory_maps[list_number])
 
-        self.allocate_job_in_memory(queue_list, 8, 0, 1, job_to_add)
+        self.allocate_job_in_memory(queue_list, 8.51, 0, 1, job_to_add)
+        print_separation()
+        print("After allocating memory")
+        print("queue_list")
+        json_stringify(queue_list)
+        print("self.memory_maps[list_number]")
+        json_stringify(self.memory_maps[list_number])
 
         # print("BEFORE FREEING MEMORY SPACE")
         # print("queue_list")
@@ -215,9 +228,20 @@ class MemoryManager:
                         f"Job with id {queued_job.id} is sleeping")
 
     def allocate_job_in_memory(self, queue_list: list[JobFragment | None], elapsed_time: float, list_number: int, start_index: int, job_to_add: JobFragment):
+        # we will consider that the indexes of allocation are continuos
         try:
             allocation_size = int(math.floor(int(job_to_add.required_size))/2)
             print(f"Space to be allocated: {allocation_size}")
+            # print(f"rounded elapsed time {int(round(elapsed_time))}")
         except:
             return
-        pass
+        # setting new start time for job that didn't start at the expected time
+        if int(job_to_add.start_time) < elapsed_time:
+            job_to_add.start_time = f"{int(round(elapsed_time))}"
+        # setting the memory fragments into memory
+        index_range = start_index, start_index + allocation_size
+        for i in range(*index_range):
+            queue_list[i] = job_to_add
+        # adding new addresses to the address tables
+        self.memory_maps[list_number][job_to_add.id] = PageTable(
+            job_to_add.id,  [i for i in range(*index_range)])
