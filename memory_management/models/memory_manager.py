@@ -87,6 +87,7 @@ class MemoryManager:
         # for i in range(NUMBER_OF_PAGES):
         #     if i % 2 == 0:
         #         queue_list[i] = Job("2", "1", "4", "3", "Sleep")
+        job_to_add = JobFragment("2", "1", "6", "3", "Sleep")
         queue_list[0] = JobFragment("2", "1", "4", "3", "Sleep")
         queue_list[0].current_state = "Running"
         queue_list[2] = JobFragment("2", "1", "4", "3", "Sleep")
@@ -112,26 +113,28 @@ class MemoryManager:
         queue_list[16] = JobFragment("4", "1", "4", "3", "Sleep")
         queue_list[18] = JobFragment("4", "1", "4", "3", "Sleep")
 
-        print("BEFORE FREEING MEMORY SPACE")
-        print("queue_list")
-        json_stringify(queue_list)
-        # print(queue_list)
-        print("self.memory_maps")
-        json_stringify(self.memory_maps)
-        print_separation()
-        print("AFTER FREEING MEMORY SPACE")
-        print("ok")
-        specific_list_table = self.memory_maps[list_number]
-        # specific_list_table: PageTable = self.memory_maps[jobs_list]
-        # free_table_values(
-        #     specific_list_table, [0, 2, 3, 5, 8, 14])
-        print(free_memory_space(queue_list, specific_list_table, 3))
-        # free_queue_list(queue_list, [0, 2, 3])
-        # JUST ERASES THE FIRST ITEM IN THE LIST
-        self.check_memory_maps(list_number)
+        self.allocate_job_in_memory(queue_list, 8, 0, 1, job_to_add)
 
-        print("self.memory_maps")
-        json_stringify(self.memory_maps)
+        # print("BEFORE FREEING MEMORY SPACE")
+        # print("queue_list")
+        # json_stringify(queue_list)
+        # # print(queue_list)
+        # print("self.memory_maps")
+        # json_stringify(self.memory_maps)
+        # print_separation()
+        # print("AFTER FREEING MEMORY SPACE")
+        # print("ok")
+        # specific_list_table = self.memory_maps[list_number]
+        # # specific_list_table: PageTable = self.memory_maps[jobs_list]
+        # # free_table_values(
+        # #     specific_list_table, [0, 2, 3, 5, 8, 14])
+        # print(free_memory_space(queue_list, specific_list_table, 3))
+        # # free_queue_list(queue_list, [0, 2, 3])
+        # # JUST ERASES THE FIRST ITEM IN THE LIST
+        # self.check_memory_maps(list_number)
+
+        # print("self.memory_maps")
+        # json_stringify(self.memory_maps)
 
         # print("queue_list")
         # json_stringify(queue_list)
@@ -210,3 +213,11 @@ class MemoryManager:
                 if queued_job.current_state == "Sleep":
                     print(
                         f"Job with id {queued_job.id} is sleeping")
+
+    def allocate_job_in_memory(self, queue_list: list[JobFragment | None], elapsed_time: float, list_number: int, start_index: int, job_to_add: JobFragment):
+        try:
+            allocation_size = int(math.floor(int(job_to_add.required_size))/2)
+            print(f"Space to be allocated: {allocation_size}")
+        except:
+            return
+        pass

@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="YRX_8cETxtdHaOABHZLi" name="Page-1">
-        <mxGraphModel dx="989" dy="311" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="983" dy="477" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -23,7 +23,7 @@
                     <mxGeometry x="270" y="320" width="180" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="10" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="70" y="560" width="270" height="60" as="geometry"/>
+                    <mxGeometry x="70" y="510" width="270" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="11" value="nextMemoryAddress?continue:freeMemorySpace(jobsList, queue_type) (FIFO) --&amp;gt; Also, if no jobs are running" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="270" y="380" width="180" height="60" as="geometry"/>
@@ -35,16 +35,16 @@
                     <mxGeometry x="270" y="430" width="180" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="15" value="checkFragmentation() --&amp;gt; Wion't afect the list, just for logging" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-                    <mxGeometry x="270" y="460" width="180" height="60" as="geometry"/>
+                    <mxGeometry x="270" y="610" width="180" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="17" value="allocateJobInMemory() --&amp;gt; handle also the tables" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-                    <mxGeometry x="270" y="500" width="180" height="60" as="geometry"/>
+                    <mxGeometry x="275" y="460" width="180" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="18" value="JOB" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d80073;fontColor=#ffffff;strokeColor=#A50040;" parent="1" vertex="1">
-                    <mxGeometry x="80" y="560" width="70" height="60" as="geometry"/>
+                    <mxGeometry x="80" y="510" width="70" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="19" value="log_memory_management() --&amp;gt; print what jobs are in memory, what address they have" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-                    <mxGeometry x="275" y="630" width="180" height="60" as="geometry"/>
+                    <mxGeometry x="270" y="560" width="180" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="20" value="LOG IN EVERY METHOD" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#CC0000;fontStyle=1" parent="1" vertex="1">
                     <mxGeometry x="510" y="400" width="60" height="30" as="geometry"/>
