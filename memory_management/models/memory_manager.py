@@ -90,11 +90,20 @@ class MemoryManager:
         queue_list[0] = JobFragment("2", "1", "4", "3", "Sleep")
         queue_list[0].current_state = "Running"
         queue_list[2] = JobFragment("2", "1", "4", "3", "Sleep")
+        queue_list[2].current_state = "Running"
         queue_list[3] = JobFragment("2", "1", "4", "3", "Sleep")
         queue_list[3].current_state = "Running"
+        queue_list[4] = JobFragment("2", "1", "4", "3", "Sleep")
+        queue_list[4].current_state = "Running"
         queue_list[5] = JobFragment("2", "1", "4", "3", "Sleep")
+        queue_list[5].current_state = "Pending"
 
         queue_list[6] = JobFragment("3", "1", "4", "3", "Running")
+        queue_list[6].current_state = "Pending"
+
+        queue_list[7] = JobFragment("5", "1", "8", "3", "Running")
+        queue_list[7].current_state = "Pending"
+
         queue_list[8] = JobFragment("3", "1", "4", "3", "Running")
         queue_list[10] = JobFragment("3", "1", "4", "3", "Running")
 
