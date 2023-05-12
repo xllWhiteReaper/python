@@ -22,6 +22,6 @@ class CustomSerializer(json.JSONEncoder):
                 "current_state": o.current_state
             }
             # Add custom serializers here, before None
-        elif isinstance(o, None):
+        elif o is None:
             return ""
         return super().default(o)

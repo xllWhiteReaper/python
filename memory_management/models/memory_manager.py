@@ -4,7 +4,9 @@ import math
 from typing import Union
 from models.job_fragment import JobFragment
 from models.page_table import PageTable
-from utils.deallocate_memory import deallocate_memory
+from utils.memory_handling.deallocate_memory import deallocate_memory
+from utils.memory_handling.free_memory_space import free_memory_space
+from utils.memory_handling.free_queue_list import free_queue_list
 # from utils.search_for_available_space import search_for_available_space
 from utils.text_utils import print_centered_text,\
     print_separation, print_n_new_lines
@@ -27,9 +29,11 @@ class MemoryManager:
         self.page_tables = []
         self.memory_data_list = [None for _ in MEMORY_DATA_PATHS]
 
-        self.memory_map: dict[str, PageTable] = {
-            "2": PageTable("2",  [0, 1, 2, 3])
-        }
+        self.memory_maps: list[dict[str, PageTable]] = [{
+            "2": PageTable("2",  [0, 2, 3, 5]),
+            "3": PageTable("3",  [6, 8, 10]),
+            "4": PageTable("4",  [12, 14, 16, 18]),
+        }]
 
     def get_jobs_from_file(self, file_name):
         print("GETTING JOBS FROM FILE")
@@ -71,7 +75,7 @@ class MemoryManager:
         elif queue_type == "worst":
             pass
 
-    def queue_best_fit_approach(self, jobs_list):
+    def queue_best_fit_approach(self, jobs_list: int):
         time_manager = TimeManager()
         print_n_new_lines(2)
         print_centered_text("Best Fit Queue")
@@ -84,17 +88,37 @@ class MemoryManager:
         #     if i % 2 == 0:
         #         queue_list[i] = Job("2", "1", "4", "3", "Sleep")
         queue_list[0] = JobFragment("2", "1", "4", "3", "Sleep")
-        # queue_list[1] = Job("2", "1", "4", "3", "End")
-        # queue_list[2] = Job("2", "1", "4", "3", "End")
-        queue_list[5] = JobFragment("2", "1", "4", "3", "End")
-        queue_list[6] = JobFragment("2", "1", "4", "3", "End")
-        queue_list[8] = JobFragment("2", "1", "4", "3", "End")
-        queue_list[10] = JobFragment("2", "1", "4", "3", "End")
-        queue_list[12] = JobFragment("2", "1", "4", "3", "End")
-        queue_list[14] = JobFragment("2", "1", "4", "3", "End")
-        queue_list[16] = JobFragment("2", "1", "4", "3", "End")
-        queue_list[18] = JobFragment("2", "1", "4", "3", "End")
-        jobs_list_copy = jobs_list[::]
+        queue_list[2] = JobFragment("2", "1", "4", "3", "Sleep")
+        queue_list[3] = JobFragment("2", "1", "4", "3", "Sleep")
+        queue_list[5] = JobFragment("2", "1", "4", "3", "Sleep")
+
+        queue_list[6] = JobFragment("3", "1", "4", "3", "Running")
+        queue_list[8] = JobFragment("3", "1", "4", "3", "Running")
+        queue_list[10] = JobFragment("3", "1", "4", "3", "Running")
+
+        queue_list[12] = JobFragment("4", "1", "4", "3", "Sleep")
+        queue_list[14] = JobFragment("4", "1", "4", "3", "Sleep")
+        queue_list[16] = JobFragment("4", "1", "4", "3", "Sleep")
+        queue_list[18] = JobFragment("4", "1", "4", "3", "Sleep")
+
+        print("BEFORE FREEING MEMORY SPACE")
+        print("queue_list")
+        json_stringify(queue_list)
+        # print(queue_list)
+        print("self.memory_maps")
+        json_stringify(self.memory_maps)
+        print_separation()
+        print("AFTER FREEING MEMORY SPACE")
+        print("ok")
+        free_queue_list(queue_list, [0, 2, 3])
+
+        print("queue_list")
+        json_stringify(queue_list)
+        # # print(queue_list)
+        # print("self.memory_maps")
+        # json_stringify(self.memory_maps)
+
+        # jobs_list_copy = jobs_list[::]
         # print("Searching for worst location")
         # print(f"Index: {search_for_worst_location(queue_list, 2)}")
         # for job in jobs_list_copy:
@@ -116,9 +140,6 @@ class MemoryManager:
         # #             pass
         # #         pass
         # print(queue_list)
-
-    def test(self):
-        print("HAHA")
 
     def queue_first_fit_approach(self, jobs_list):
         pass
