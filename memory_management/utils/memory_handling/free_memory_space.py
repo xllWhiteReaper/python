@@ -1,7 +1,7 @@
 from models.job_fragment import JobFragment
 from models.page_table import PageTable
-from utils.memory_handling.update_queue_list import update_queue_list
-from utils.memory_handling.update_table_values import update_table_values
+# from utils.memory_handling.update_queue_list import update_queue_list
+from utils.memory_handling.free_table_values import free_table_values
 
 
 def free_memory_space(queue_list: list[JobFragment | None], memory_map: dict[str, PageTable], target_memory: int) -> int:

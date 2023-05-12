@@ -1,11 +1,10 @@
 import csv
 import math
 
-from typing import Union
 from models.job_fragment import JobFragment
 from models.page_table import PageTable
 from utils.memory_handling.deallocate_memory import deallocate_memory
-from utils.memory_handling.free_memory_space import free_memory_space
+from utils.memory_handling.free_table_values import free_table_values
 from utils.memory_handling.free_queue_list import free_queue_list
 # from utils.search_for_available_space import search_for_available_space
 from utils.text_utils import print_centered_text,\
@@ -29,7 +28,7 @@ class MemoryManager:
         self.page_tables = []
         self.memory_data_list = [None for _ in MEMORY_DATA_PATHS]
 
-        self.memory_maps: list[dict[str, PageTable]] = [{
+        self.memory_maps: list[dict[str, PageTable | None]] = [{
             "2": PageTable("2",  [0, 2, 3, 5]),
             "3": PageTable("3",  [6, 8, 10]),
             "4": PageTable("4",  [12, 14, 16, 18]),
@@ -75,7 +74,7 @@ class MemoryManager:
         elif queue_type == "worst":
             pass
 
-    def queue_best_fit_approach(self, jobs_list: int):
+    def queue_best_fit_approach(self, list_number: int):
         time_manager = TimeManager()
         print_n_new_lines(2)
         print_centered_text("Best Fit Queue")
@@ -110,11 +109,20 @@ class MemoryManager:
         print_separation()
         print("AFTER FREEING MEMORY SPACE")
         print("ok")
-        free_queue_list(queue_list, [0, 2, 3])
+        specific_list_table = self.memory_maps[list_number]
+        # specific_list_table: PageTable = self.memory_maps[jobs_list]
+        free_table_values(
+            specific_list_table, [0, 2, 3, 5, 8, 14])
+        # free_queue_list(queue_list, [0, 2, 3])
+        # JUST ERASES THE FIRST ITEM IN THE LIST
+        self.memory_maps[list_number] = {
+            key: value for key, value in self.memory_maps[list_number].items() if value is not None}
 
-        print("queue_list")
-        json_stringify(queue_list)
-        # # print(queue_list)
+        print("self.memory_maps")
+        json_stringify(self.memory_maps)
+
+        # print("queue_list")
+        # json_stringify(queue_list)
         # print("self.memory_maps")
         # json_stringify(self.memory_maps)
 
@@ -147,15 +155,15 @@ class MemoryManager:
     def queue_worst_fit_approach(self, jobs_list):
         pass
 
-    def queue_handler(self, list_number, queue_type):
+    def queue_handler(self, list_number: int, queue_type: str):
         try:
-            job_list = self.memory_data_list[list_number]
+            # job_list = self.memory_data_list[list_number]
             if queue_type == "best":
-                self.queue_best_fit_approach(job_list)
+                self.queue_best_fit_approach(list_number)
             elif queue_type == "first":
-                self.queue_first_fit_approach(job_list)
+                self.queue_first_fit_approach(list_number)
             elif queue_type == "worst":
-                self.queue_worst_fit_approach(job_list)
+                self.queue_worst_fit_approach(list_number)
         except:
             return
 
