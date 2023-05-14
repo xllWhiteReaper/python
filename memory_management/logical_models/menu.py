@@ -1,7 +1,7 @@
 from utils.text_utils import print_centered_text,\
     print_separation, print_n_new_lines
-    
-from models.memory_manager import MemoryManager
+
+from logical_models.memory_manager import MemoryManager
 
 
 class Menu:

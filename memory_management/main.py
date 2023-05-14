@@ -1,5 +1,4 @@
-import json
-from models.menu import Menu, MemoryManager
+from logical_models.menu import Menu, MemoryManager
 
 
 def main() -> None:
