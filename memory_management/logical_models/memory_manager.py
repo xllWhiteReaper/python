@@ -98,37 +98,42 @@ class MemoryManager:
 
         # Simulates the constant checking by the OS
         # while self.memory_data_list[list_number]:
-        while time_manager.get_elapsed_time() < 12:
-            print_separation()
-            self.check_jobs_in_memory_status(
-                queue_list, time_manager.get_elapsed_time(), list_number)
-            jobs_list = self.memory_data_list[list_number]
-            job_to_add: JobFragment | None
-            if jobs_list is not None and len(jobs_list) > 0:
-                job_to_add = jobs_list[0]
-            else:
-                job_to_add = None
-            allocation_size = TOTAL_MEMORY_SIZE + 1
-            if job_to_add is not None:
-                allocation_size = int(math.floor(
-                    int(job_to_add.required_size))/2)
-            next_memory_address = search_for_available_space(
-                queue_list, "best", allocation_size)
+        jobs_list = self.memory_data_list[list_number]
+        if jobs_list is not None:
+            while len(jobs_list) > 0 or self.jobs_still_running(queue_list):
+                print_separation()
+                jobs_list = self.memory_data_list[list_number]
+                job_to_add: JobFragment | None
+                if jobs_list is not None and len(jobs_list) > 0:
+                    job_to_add = jobs_list[0]
+                else:
+                    job_to_add = None
+                allocation_size = TOTAL_MEMORY_SIZE + 1
+                if job_to_add is not None:
+                    allocation_size = int(math.floor(
+                        int(job_to_add.required_size))/2)
+                next_memory_address = search_for_available_space(
+                    queue_list, "best", allocation_size)
 
-            if next_memory_address == -1 and jobs_list is not None:
-                next_memory_address, pending_jobs = free_memory_space(
-                    queue_list, self.memory_maps[list_number], allocation_size)
-                [jobs_list.append(job) for job in pending_jobs]
-                self.check_memory_maps(list_number)
+                if next_memory_address == -1 and jobs_list is not None:
+                    next_memory_address, pending_jobs = free_memory_space(
+                        queue_list, self.memory_maps[list_number], allocation_size)
+                    [jobs_list.append(job) for job in pending_jobs]
+                    self.check_memory_maps(list_number)
 
-            if next_memory_address > -1 and job_to_add is not None and jobs_list is not None:
-                # print("ALLOCATING")
-                self.allocate_job_in_memory(queue_list, time_manager.get_elapsed_time(
-                ), list_number, next_memory_address, job_to_add)
-                jobs_list.pop(0)
+                if next_memory_address > -1 and job_to_add is not None and jobs_list is not None:
+                    # print("ALLOCATING")
+                    self.allocate_job_in_memory(queue_list, time_manager.get_elapsed_time(
+                    ), list_number, next_memory_address, job_to_add)
+                    jobs_list.pop(0)
 
-            time_manager.sleep(CHECKING_INTERVAL)
+                self.check_jobs_in_memory_status(
+                    queue_list, time_manager.get_elapsed_time(), list_number)
 
+                time_manager.sleep(CHECKING_INTERVAL)
+
+            print_n_new_lines(2)
+            print("All jobs finished their execution!")
         # queue_list[6] = JobFragment("6", "1", "4", "3", "Running")
         # queue_list[6].current_state = "Pending"
 
@@ -197,6 +202,12 @@ class MemoryManager:
         # #             pass
         # #         pass
         # print(queue_list)
+
+    def jobs_still_running(self, queue_list: list[JobFragment | None]) -> bool:
+        # json_stringify([job.current_state
+        #                for job in queue_list if job is not None])
+        return True if any([job.current_state == "Running" for job in queue_list if job is not None]) else False
+
     def check_memory_maps(self, list_number: int):
         self.memory_maps[list_number] = {
             key: value for key, value in self.memory_maps[list_number].items() if value is not None}
@@ -228,7 +239,7 @@ class MemoryManager:
                         # Add color green
                         print(
                             f"Job with id {queued_job.id} has started running")
-                        queued_job.current_state = "running"
+                        queued_job.current_state = "Running"
                     # Supposing that the csv schema is adequate and every task will start its
                     # execution at the estated time
                     elif elapsed_time >= int(queued_job.start_time) + int(queued_job.execution_interval):
@@ -247,6 +258,10 @@ class MemoryManager:
                 if queued_job.current_state == "Sleep":
                     print(
                         f"Job with id {queued_job.id} is sleeping")
+
+                if queued_job.current_state == "Running":
+                    print(
+                        f"Job with id {queued_job.id} is running")
 
     def allocate_job_in_memory(self, queue_list: list[JobFragment | None], elapsed_time: float, list_number: int, start_index: int, job_to_add: JobFragment):
         # we will consider that the indexes of allocation are continuos
