@@ -21,7 +21,7 @@ class CustomSerializer(json.JSONEncoder):
                 "state_after_interval": o.state_after_interval,
                 "current_state": o.current_state
             }
-            # Add custom serializers here, before None
+        # Add custom serializers here, before None
         elif o is None:
             return ""
         return super().default(o)

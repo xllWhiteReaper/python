@@ -7,17 +7,17 @@ from utils.from_decimal_to_hexadecimal import from_decimal_to_hexadecimal
 from utils.memory_handling.deallocate_memory import deallocate_memory
 from utils.memory_handling.free_memory_space import free_memory_space
 from utils.memory_handling.search_for_available_space import search_for_available_space
-from utils.searching_algorithms.existing_job_with_same_id_in_memory import existing_job_with_same_id_in_memory
+from utils.existing_job_with_same_id_in_memory import existing_job_with_same_id_in_memory
 from utils.text_utils import print_centered_text,\
     print_separation, print_n_new_lines
-from utils.debugger import json_stringify
+# from utils.debugger import json_stringify
 from utils.time_manager import TimeManager
 
 PAGE_SIZE = 1
 REAL_EXECUTION_TIME = 0.01
 TOTAL_MEMORY_SIZE = 20
 NUMBER_OF_PAGES = math.floor(TOTAL_MEMORY_SIZE/PAGE_SIZE)
-CHECKING_INTERVAL = 3
+CHECKING_INTERVAL = 1
 MEMORY_DATA_PATHS = [
     "./data/first_list.csv",
     "./data/second_list.csv"
@@ -46,24 +46,12 @@ class MemoryManager:
     def get_jobs_from_n_list(self, n: int) -> None:
         try:
             URL = MEMORY_DATA_PATHS[n]
-            print(URL)
-            print("URL")
             self.memory_data_list[n] = self.get_jobs_from_file(URL)
-            print("self.memory_data_list[n]")
-            json_stringify(self.memory_data_list[n])
         except:
             return
 
     def show_os_simulation(self, list_number: int = 0) -> None:
         self.queue_with_specific_fit_approach(list_number, "best")
-
-    def add_to_queue(self, queue_list: list[None | JobFragment], job: JobFragment, queue_type: str) -> None:
-        if queue_type == "best":
-            pass
-        elif queue_type == "first":
-            pass
-        elif queue_type == "worst":
-            pass
 
     def queue_with_specific_fit_approach(self, list_number: int, queue_type: str) -> None:
         time_manager = TimeManager()
@@ -110,7 +98,6 @@ class MemoryManager:
                     self.check_memory_maps(list_number)
 
                 if next_memory_address > -1 and job_to_add is not None and jobs_list is not None:
-                    # print("ALLOCATING")
                     self.allocate_job_in_memory(queue_list, time_manager.get_elapsed_time(
                     ), list_number, next_memory_address, job_to_add)
                     jobs_list.pop(0)
