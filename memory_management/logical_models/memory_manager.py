@@ -5,12 +5,9 @@ from models.job_fragment import JobFragment
 from models.page_table import PageTable
 from utils.from_decimal_to_hexadecimal import from_decimal_to_hexadecimal
 from utils.memory_handling.deallocate_memory import deallocate_memory
-from utils.memory_handling.free_table_values import free_table_values
-from utils.memory_handling.free_queue_list import free_queue_list
 from utils.memory_handling.free_memory_space import free_memory_space
 from utils.memory_handling.search_for_available_space import search_for_available_space
 from utils.searching_algorithms.existing_job_with_same_id_in_memory import existing_job_with_same_id_in_memory
-# from utils.search_for_available_space import search_for_available_space
 from utils.text_utils import print_centered_text,\
     print_separation, print_n_new_lines
 from utils.debugger import json_stringify
@@ -58,7 +55,7 @@ class MemoryManager:
             return
 
     def show_os_simulation(self, list_number: int = 0) -> None:
-        self.queue_best_fit_approach(list_number)
+        self.queue_with_specific_fit_approach(list_number, "best")
 
     def add_to_queue(self, queue_list: list[None | JobFragment], job: JobFragment, queue_type: str) -> None:
         if queue_type == "best":
@@ -68,19 +65,17 @@ class MemoryManager:
         elif queue_type == "worst":
             pass
 
-    def queue_best_fit_approach(self, list_number: int):
+    def queue_with_specific_fit_approach(self, list_number: int, queue_type: str) -> None:
         time_manager = TimeManager()
         print_n_new_lines(2)
-        print_centered_text("Best Fit Queue")
+        print_centered_text(
+            f"{queue_type.title()} Fit Queue for list {list_number + 1}")
         print_n_new_lines()
         print(f"Started the process of queuing")
         print_n_new_lines()
         queue_list: list[None | JobFragment] = [
             None for _ in range(NUMBER_OF_PAGES)]
         jobs_list = self.memory_data_list[list_number]
-        print("jobs_list")
-        json_stringify(jobs_list)
-        print("BEFORE IF")
 
         if jobs_list is not None:
             while len(jobs_list) > 0 or self.jobs_still_running(queue_list):
@@ -106,7 +101,7 @@ class MemoryManager:
                             queue_list, self.memory_maps[list_number], job_to_add.id)
 
                     next_memory_address = search_for_available_space(
-                        queue_list, "best", allocation_size)
+                        queue_list, queue_type, allocation_size)
 
                 if next_memory_address == -1 and jobs_list is not None:
                     next_memory_address, pending_jobs = free_memory_space(
@@ -135,21 +130,10 @@ class MemoryManager:
         self.memory_maps[list_number] = {
             key: value for key, value in self.memory_maps[list_number].items() if value is not None}
 
-    def queue_first_fit_approach(self, jobs_list):
-        pass
-
-    def queue_worst_fit_approach(self, jobs_list):
-        pass
-
     def queue_handler(self, list_number: int, queue_type: str):
         try:
             self.get_jobs_from_n_list(list_number)
-            if queue_type == "best":
-                self.queue_best_fit_approach(list_number)
-            elif queue_type == "first":
-                self.queue_first_fit_approach(list_number)
-            elif queue_type == "worst":
-                self.queue_worst_fit_approach(list_number)
+            self.queue_with_specific_fit_approach(list_number, queue_type)
         except:
             return
 
