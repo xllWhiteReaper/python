@@ -9,6 +9,7 @@ from utils.memory_handling.free_table_values import free_table_values
 from utils.memory_handling.free_queue_list import free_queue_list
 from utils.memory_handling.free_memory_space import free_memory_space
 from utils.memory_handling.search_for_available_space import search_for_available_space
+from utils.searching_algorithms.existing_job_with_same_id_in_memory import existing_job_with_same_id_in_memory
 # from utils.search_for_available_space import search_for_available_space
 from utils.text_utils import print_centered_text,\
     print_separation, print_n_new_lines
@@ -21,8 +22,8 @@ TOTAL_MEMORY_SIZE = 20
 NUMBER_OF_PAGES = math.floor(TOTAL_MEMORY_SIZE/PAGE_SIZE)
 CHECKING_INTERVAL = 3
 MEMORY_DATA_PATHS = [
-    "./first_list.csv",
-    "./second_list.csv"
+    "./data/first_list.csv",
+    "./data/second_list.csv"
 ]
 
 
@@ -48,7 +49,11 @@ class MemoryManager:
     def get_jobs_from_n_list(self, n: int) -> None:
         try:
             URL = MEMORY_DATA_PATHS[n]
+            print(URL)
+            print("URL")
             self.memory_data_list[n] = self.get_jobs_from_file(URL)
+            print("self.memory_data_list[n]")
+            json_stringify(self.memory_data_list[n])
         except:
             return
 
@@ -73,7 +78,8 @@ class MemoryManager:
         queue_list: list[None | JobFragment] = [
             None for _ in range(NUMBER_OF_PAGES)]
         jobs_list = self.memory_data_list[list_number]
-
+        print("jobs_list")
+        json_stringify(jobs_list)
         print("BEFORE IF")
 
         if jobs_list is not None:
@@ -81,6 +87,7 @@ class MemoryManager:
                 print_separation()
                 jobs_list = self.memory_data_list[list_number]
                 job_to_add: JobFragment | None
+                next_memory_address = -1
                 if jobs_list is not None and len(jobs_list) > 0:
                     job_to_add = jobs_list[0]
                 else:
@@ -89,8 +96,17 @@ class MemoryManager:
                 if job_to_add is not None:
                     allocation_size = int(math.floor(
                         int(job_to_add.required_size))/2)
-                next_memory_address = search_for_available_space(
-                    queue_list, "best", allocation_size)
+
+                    # check if it is already in the list
+                    already_in_list = existing_job_with_same_id_in_memory(
+                        queue_list, allocation_size, job_to_add.id)
+
+                    if (already_in_list):
+                        deallocate_memory(
+                            queue_list, self.memory_maps[list_number], job_to_add.id)
+
+                    next_memory_address = search_for_available_space(
+                        queue_list, "best", allocation_size)
 
                 if next_memory_address == -1 and jobs_list is not None:
                     next_memory_address, pending_jobs = free_memory_space(

@@ -1,5 +1,4 @@
 import time
-from utils.debugger import json_stringify
 from utils.text_utils import print_centered_text,\
     print_separation, print_n_new_lines
 
@@ -21,7 +20,6 @@ ACTIONS = {
 
 class Menu:
     def __init__(self) -> None:
-        selected_option = -1
         self.memoryManager = MemoryManager()
 
     def show(self):
@@ -51,7 +49,5 @@ class Menu:
                 break
 
             else:
-                # print(f"Picked option with parameters ")
-                # json_stringify(ACTIONS[option])
                 self.memoryManager.queue_handler(*ACTIONS[option])
                 time.sleep(0.2)
