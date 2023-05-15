@@ -1,5 +1,5 @@
 import time
-from utils.text_utils import print_centered_text,\
+from utils.text_utils import print_centered_text, print_red,\
     print_separation, print_n_new_lines
 
 from logical_models.memory_manager import MemoryManager
@@ -40,7 +40,7 @@ class Menu:
             option = input()
 
             if option not in POSSIBLE_ANSWERS:
-                print(
+                print_red(
                     f"Please enter only {','.join([str(answer) for answer in POSSIBLE_ANSWERS])}")
                 time.sleep(0.2)
                 continue

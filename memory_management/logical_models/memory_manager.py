@@ -3,13 +3,14 @@ import math
 
 from models.job_fragment import JobFragment
 from models.page_table import PageTable
+from utils.find_fragmentation import find_fragmentation
 from utils.from_decimal_to_hexadecimal import from_decimal_to_hexadecimal
 from utils.memory_handling.deallocate_memory import deallocate_memory
 from utils.memory_handling.free_memory_space import free_memory_space
 from utils.memory_handling.search_for_available_space import search_for_available_space
 from utils.existing_job_with_same_id_in_memory import existing_job_with_same_id_in_memory
-from utils.text_utils import print_centered_text,\
-    print_separation, print_n_new_lines
+from utils.text_utils import print_aqua, print_centered_text, print_green,\
+    print_separation, print_n_new_lines, print_yellow
 # from utils.debugger import json_stringify
 from utils.time_manager import TimeManager
 
@@ -105,10 +106,12 @@ class MemoryManager:
                 self.check_jobs_in_memory_status(
                     queue_list, time_manager.get_elapsed_time(), list_number)
 
+                find_fragmentation(queue_list)
+
                 time_manager.sleep(CHECKING_INTERVAL)
 
             print_n_new_lines(2)
-            print("All jobs finished their execution!")
+            print_green("All jobs finished their execution!")
 
     def jobs_still_running(self, queue_list: list[JobFragment | None]) -> bool:
         return True if any([job.current_state == "Running" for job in queue_list if job is not None]) else False
@@ -131,13 +134,13 @@ class MemoryManager:
                 try:
                     if elapsed_time >= int(queued_job.start_time) and queued_job.current_state == "Pending":
                         # Add color green
-                        print(
+                        print_aqua(
                             f"Job with id {queued_job.id} has started running")
                         queued_job.current_state = "Running"
                     # Supposing that the csv schema is adequate and every task will start its
                     # execution at the estated time
                     elif elapsed_time >= int(queued_job.start_time) + int(queued_job.execution_interval):
-                        print(
+                        print_green(
                             f"Job with id {queued_job.id} has finished its execution interval")
                         queued_job.current_state = queued_job.state_after_interval
 
@@ -150,11 +153,11 @@ class MemoryManager:
                         queue_list, self.memory_maps[list_number], queued_job.id)
 
                 if queued_job.current_state == "Sleep":
-                    print(
+                    print_yellow(
                         f"Job with id {queued_job.id} is sleeping")
 
                 if queued_job.current_state == "Running":
-                    print(
+                    print_aqua(
                         f"Job with id {queued_job.id} is running")
 
     def allocate_job_in_memory(self, queue_list: list[JobFragment | None], elapsed_time: float, list_number: int, start_index: int, job_to_add: JobFragment):
@@ -171,7 +174,7 @@ class MemoryManager:
         for i in range(*index_range):
             queue_list[i] = job_to_add
             # simulates that it is a hexadecimal location
-            print(
+            print_yellow(
                 f"Job with Id: {job_to_add.id} has been allocated to memory in address: {from_decimal_to_hexadecimal(str(i))}")
 
         # adding new addresses to the address tables

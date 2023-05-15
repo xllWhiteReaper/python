@@ -1,5 +1,6 @@
 from models.page_table import PageTable
 from utils.from_decimal_to_hexadecimal import from_decimal_to_hexadecimal
+from utils.text_utils import print_red
 
 
 def free_table_values(memory_map: dict[str, PageTable | None], memory_indexes: list[int]) -> None:
@@ -7,7 +8,7 @@ def free_table_values(memory_map: dict[str, PageTable | None], memory_indexes: l
         if page_table is not None:
             addresses = page_table.memory_addresses
             [
-                print(
+                print_red(
                     f"Memory freed for the Job with Id: {key} in memory address: {from_decimal_to_hexadecimal(str(x))}")
                 for x in addresses if x in memory_indexes]
             new_addresses = [
