@@ -17,13 +17,13 @@ def main() -> None:
     #     FileBlock("1"),
     #     FileBlock("4"),
     # )
-    file_manager = FileManager()
-    file_manager.read_file(0)
-    json_stringify(file_manager.files[0])
+    # file_manager = FileManager()
+    # file_manager.read_file(0)
+    # json_stringify(file_manager.files[0])
     # file.calculate_file_size()
     # print(file.size)
-    # menu = Menu()
-    # menu.show()
+    menu = Menu()
+    menu.show()
 
 
 if __name__ == "__main__":

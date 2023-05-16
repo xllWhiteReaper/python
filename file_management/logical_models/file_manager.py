@@ -145,6 +145,8 @@ class FileManager:
             memory_blocks_string, allocation_time, deallocation_time = tuple(
                 next(csv_reader))
             try:
+                # to refresh the file if the user makes another petition
+                self.files[file_number] = File()
                 self.files[file_number].allocation_time = float(
                     allocation_time)
                 self.files[file_number].deallocation_time = float(
