@@ -45,4 +45,5 @@ class Menu:
 
             else:
                 print("well done!")
+                self.file_manager.read_file(int(option)-1)
                 time.sleep(0.2)

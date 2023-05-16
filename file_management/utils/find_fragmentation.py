@@ -1,8 +1,8 @@
-from models.job_fragment import JobFragment
+from models.memory_fragment import MemoryFragment
 from utils.text_utils import print_magenta
 
 
-def find_fragmentation(jobs_list: list[JobFragment | None]) -> None:
+def find_fragmentation(jobs_list: list[MemoryFragment | None]) -> None:
     start_index = None
     for i, job in enumerate(jobs_list):
         if job is not None:

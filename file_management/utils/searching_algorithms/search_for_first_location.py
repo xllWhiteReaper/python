@@ -1,7 +1,7 @@
-from models.job_fragment import JobFragment
+from models.memory_fragment import MemoryFragment
 
 
-def search_for_first_location(queue_list: list[JobFragment | None], target_memory: int) -> int:
+def search_for_first_location(queue_list: list[MemoryFragment | None], target_memory: int) -> int:
     counter: int = 0
     index: int = -1
     possible_index: int = -1

@@ -1,20 +1,21 @@
-from models.job_fragment import JobFragment
+from models.memory_fragment import MemoryFragment
 from models.page_table import PageTable
 from utils.memory_handling.free_queue_list import free_queue_list
 from utils.memory_handling.free_table_values import free_table_values
+POSSIBLE_STATUSES_TO_BE_DEALLOCATED = ["Sleep", "Pending"]
 
 
-def free_memory_space(queue_list: list[JobFragment | None], memory_map: dict[str, PageTable | None], target_memory: int) -> tuple[int, list[JobFragment]]:
+def free_memory_space(queue_list: list[MemoryFragment | None], memory_map: dict[str, PageTable | None], target_memory: int) -> tuple[int, list[MemoryFragment]]:
     # I will just use the first space that I find, because I might be
     # making it more complex than needed, IT COULD BE MADE EVEN MORE
     # EFFICIENTLY
-    pending_jobs: list[JobFragment] = []
-    possible_statuses_to_be_deallocated = ["Sleep", "Pending"]
+    pending_jobs: list[MemoryFragment] = []
+
     counter: int = 0
     index: int = -1
     possible_index: int = -1
     for idx, job_fragment in enumerate(queue_list):
-        if job_fragment is None or job_fragment.current_state in possible_statuses_to_be_deallocated:
+        if job_fragment is None or job_fragment.current_state in POSSIBLE_STATUSES_TO_BE_DEALLOCATED:
             counter += 1
 
             if counter == 1:

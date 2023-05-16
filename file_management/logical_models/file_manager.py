@@ -3,7 +3,7 @@ import math
 from models.file import File
 from models.file_block import FileBlock
 
-from models.job_fragment import JobFragment
+from models.memory_fragment import MemoryFragment
 from models.page_table import PageTable
 from utils.find_fragmentation import find_fragmentation
 from utils.from_decimal_to_hexadecimal import from_decimal_to_hexadecimal
@@ -11,9 +11,10 @@ from utils.memory_handling.deallocate_memory import deallocate_memory
 from utils.memory_handling.free_memory_space import free_memory_space
 from utils.memory_handling.search_for_available_space import search_for_available_space
 from utils.existing_job_with_same_id_in_memory import existing_job_with_same_id_in_memory
+from utils.searching_algorithms.search_for_page_indexes import search_for_page_indexes
 from utils.text_utils import print_aqua, print_centered_text, print_green,\
     print_separation, print_n_new_lines, print_yellow
-# from utils.debugger import json_stringify
+from utils.debugger import json_stringify
 from utils.time_manager import TimeManager
 
 DISK_BLOCK_SIZE = 1
@@ -34,7 +35,7 @@ FILE_DATA_PATHS = [
 
 class FileManager:
     def __init__(self) -> None:
-        self.memory_data_list: list[list[JobFragment] | None] = [
+        self.memory_data_list: list[list[MemoryFragment] | None] = [
             None for _ in MEMORY_DATA_PATHS]
 
         self.memory_maps: list[dict[str, (PageTable | None)]] = [
@@ -42,14 +43,14 @@ class FileManager:
 
         self.files: list[File] = [File() for _ in FILE_DATA_PATHS]
 
-    def get_jobs_from_file(self, file_name: str) -> list[JobFragment]:
-        jobs: list[JobFragment] = []
+    def get_jobs_from_file(self, file_name: str) -> list[MemoryFragment]:
+        jobs: list[MemoryFragment] = []
         with open(file_name) as csv_file:
             csv_reader = csv.reader(csv_file)
             for row in csv_reader:
                 id, start_time, required_size, execution_interval, state_after_interval = tuple(
                     row)
-                jobs.append(JobFragment(id, start_time, required_size,
+                jobs.append(MemoryFragment(id, start_time, required_size,
                             execution_interval, state_after_interval))
         return jobs
 
@@ -71,7 +72,7 @@ class FileManager:
         print_n_new_lines()
         print(f"Started the process of queuing")
         print_n_new_lines()
-        queue_list: list[None | JobFragment] = [
+        queue_list: list[None | MemoryFragment] = [
             None for _ in range(NUMBER_OF_PAGES)]
         jobs_list = self.memory_data_list[list_number]
 
@@ -79,7 +80,7 @@ class FileManager:
             while len(jobs_list) > 0 or self.jobs_still_running(queue_list):
                 print_separation()
                 jobs_list = self.memory_data_list[list_number]
-                job_to_add: JobFragment | None
+                job_to_add: MemoryFragment | None
                 next_memory_address = -1
                 if jobs_list is not None and len(jobs_list) > 0:
                     job_to_add = jobs_list[0]
@@ -122,7 +123,7 @@ class FileManager:
             print_n_new_lines(2)
             print_green("All jobs finished their execution!")
 
-    def jobs_still_running(self, queue_list: list[JobFragment | None]) -> bool:
+    def jobs_still_running(self, queue_list: list[MemoryFragment | None]) -> bool:
         return True if any([job.current_state == "Running" for job in queue_list if job is not None]) else False
 
     def check_memory_maps(self, list_number: int):
@@ -137,6 +138,7 @@ class FileManager:
             return
 
     def read_file(self, file_number: int) -> None:
+        print("IN READ FILE")
         if file_number >= len(FILE_DATA_PATHS):
             return
         file_name = FILE_DATA_PATHS[file_number]
@@ -155,8 +157,28 @@ class FileManager:
                     *[FileBlock(meta_data) for meta_data in memory_blocks_string.split("-")])
             except:
                 return
+        queue_list: list[None | MemoryFragment] = [
+            None for _ in range(NUMBER_OF_PAGES)]
+        queue_list[0] = MemoryFragment("1", "2", "4", "4", "Sleep")
+        queue_list[0].current_state = "Sleep"
 
-    def check_jobs_in_memory_status(self, queue_list: list[JobFragment | None], elapsed_time: float, list_number: int) -> None:
+        queue_list[2] = MemoryFragment("1", "2", "4", "4", "Sleep")
+        queue_list[2].current_state = "Running"
+        queue_list[3] = MemoryFragment("1", "2", "4", "4", "Sleep")
+        queue_list[3].current_state = "Running"
+        queue_list[5] = MemoryFragment("1", "2", "4", "4", "Sleep")
+        queue_list[5].current_state = "Running"
+        queue_list[9] = MemoryFragment("1", "2", "4", "4", "Sleep")
+        queue_list[9].current_state = "Running"
+        queue_list[18] = MemoryFragment("1", "2", "4", "4", "Sleep")
+        queue_list[18].current_state = "Running"
+        print("Searching for indexes")
+        json_stringify(search_for_page_indexes(queue_list, 8))
+
+    def show_allocation_for_file(self, file_number: int):
+        pass
+
+    def check_jobs_in_memory_status(self, queue_list: list[MemoryFragment | None], elapsed_time: float, list_number: int) -> None:
         found_job_id: str = "-1"
         for queued_job in queue_list:
             if queued_job is not None and queued_job.id != found_job_id:
@@ -189,7 +211,7 @@ class FileManager:
                     print_aqua(
                         f"Job with id {queued_job.id} is running")
 
-    def allocate_job_in_memory(self, queue_list: list[JobFragment | None], elapsed_time: float, list_number: int, start_index: int, job_to_add: JobFragment):
+    def allocate_job_in_memory(self, queue_list: list[MemoryFragment | None], elapsed_time: float, list_number: int, start_index: int, job_to_add: MemoryFragment):
         # we will consider that the indexes of allocation are continuos
         try:
             allocation_size = int(math.floor(int(job_to_add.required_size))/2)
@@ -209,3 +231,23 @@ class FileManager:
         # adding new addresses to the address tables
         self.memory_maps[list_number][job_to_add.id] = PageTable(
             job_to_add.id,  [i for i in range(*index_range)])
+
+    def allocate_file_in_memory(
+        self,
+        queue_list: list[MemoryFragment | None],
+        list_number: int,
+        elapsed_time: int,
+        indexes: list[int],
+        file_to_add: MemoryFragment
+    ):
+        # setting new start time for job that didn't start at the expected time
+        if int(file_to_add.start_time) < elapsed_time:
+            file_to_add.start_time = f"{int(round(elapsed_time))}"
+        for index in indexes:
+            queue_list[index] = file_to_add
+            # simulates that it is a hexadecimal location
+            print_yellow(
+                f"File with Id: {file_to_add.id} has been allocated to memory in address: {from_decimal_to_hexadecimal(str(index))}")
+        # adding new addresses to the address tables
+        self.memory_maps[list_number][file_to_add.id] = PageTable(
+            file_to_add.id,  indexes)

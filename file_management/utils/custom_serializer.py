@@ -2,7 +2,7 @@ import json
 from typing import Any
 from models.file import File
 from models.file_block import FileBlock
-from models.job_fragment import JobFragment
+from models.memory_fragment import MemoryFragment
 from models.linked_list import LinkedList
 from models.node import Node
 
@@ -16,7 +16,7 @@ class CustomSerializer(json.JSONEncoder):
                 "memory_addresses": o.memory_addresses,
                 "job_id": o.job_id
             }
-        elif isinstance(o, JobFragment):
+        elif isinstance(o, MemoryFragment):
             return {
                 "id": o.id,
                 "start_time": o.start_time,

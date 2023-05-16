@@ -1,4 +1,4 @@
-class JobFragment:
+class MemoryFragment:
     def __init__(self,
                  id: str,
                  start_time: str,
