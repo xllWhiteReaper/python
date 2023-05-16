@@ -1,5 +1,7 @@
 import csv
 import math
+from models.file import File
+from models.file_block import FileBlock
 
 from models.job_fragment import JobFragment
 from models.page_table import PageTable
@@ -13,6 +15,9 @@ from utils.text_utils import print_aqua, print_centered_text, print_green,\
     print_separation, print_n_new_lines, print_yellow
 # from utils.debugger import json_stringify
 from utils.time_manager import TimeManager
+
+DISK_BLOCK_SIZE = 1
+
 
 PAGE_SIZE = 1
 REAL_EXECUTION_TIME = 0.01
@@ -34,6 +39,8 @@ class FileManager:
 
         self.memory_maps: list[dict[str, (PageTable | None)]] = [
             {} for _ in MEMORY_DATA_PATHS]
+
+        self.files: list[File] = [File() for _ in FILE_DATA_PATHS]
 
     def get_jobs_from_file(self, file_name: str) -> list[JobFragment]:
         jobs: list[JobFragment] = []
@@ -128,6 +135,24 @@ class FileManager:
             self.queue_with_specific_fit_approach(list_number, queue_type)
         except:
             return
+
+    def read_file(self, file_number: int) -> None:
+        if file_number >= len(FILE_DATA_PATHS):
+            return
+        file_name = FILE_DATA_PATHS[file_number]
+        with open(file_name) as csv_file:
+            csv_reader = csv.reader(csv_file)
+            memory_blocks_string, allocation_time, deallocation_time = tuple(
+                next(csv_reader))
+            try:
+                self.files[file_number].allocation_time = float(
+                    allocation_time)
+                self.files[file_number].deallocation_time = float(
+                    deallocation_time)
+                self.files[file_number].append(
+                    *[FileBlock(meta_data) for meta_data in memory_blocks_string.split("-")])
+            except:
+                return
 
     def check_jobs_in_memory_status(self, queue_list: list[JobFragment | None], elapsed_time: float, list_number: int) -> None:
         found_job_id: str = "-1"

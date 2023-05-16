@@ -1,7 +1,7 @@
 import json
 from typing import Any
 from models.file import File
-from models.file_fragment import FileFragment
+from models.file_block import FileBlock
 from models.job_fragment import JobFragment
 from models.linked_list import LinkedList
 from models.node import Node
@@ -25,7 +25,7 @@ class CustomSerializer(json.JSONEncoder):
                 "state_after_interval": o.state_after_interval,
                 "current_state": o.current_state
             }
-        elif isinstance(o, FileFragment):
+        elif isinstance(o, FileBlock):
             return {
                 "size": o.size,
                 "metadata": o.metadata,
@@ -45,6 +45,8 @@ class CustomSerializer(json.JSONEncoder):
             return {
                 "size": o.size,
                 "file_fragments": o.file_fragments,
+                "allocation_time": o.allocation_time,
+                "deallocation_time": o.deallocation_time,
             }
         # Add custom serializers here, before None
         elif o is None:
