@@ -45,5 +45,5 @@ class Menu:
 
             else:
                 print("well done!")
-                self.file_manager.show_allocation_for_file(int(option)-1)
+                self.file_manager.show_allocation_for_file(int(option)-1, 0, 6)
                 time.sleep(0.2)

@@ -6,9 +6,12 @@ from models.file_block import FileBlock
 from models.memory_fragment import MemoryFragment
 from models.page_table import PageTable
 from utils.find_fragmentation import find_fragmentation
+from utils.float_to_int import float_to_int
 from utils.from_decimal_to_hexadecimal import from_decimal_to_hexadecimal
 from utils.memory_handling.deallocate_memory import deallocate_memory
 from utils.memory_handling.free_memory_space import free_memory_space
+from utils.memory_handling.free_queue_list import free_queue_list
+from utils.memory_handling.free_table_values import free_table_values
 from utils.memory_handling.search_for_available_space import search_for_available_space
 from utils.existing_job_with_same_id_in_memory import existing_job_with_same_id_in_memory
 from utils.searching_algorithms.search_for_page_indexes import search_for_page_indexes
@@ -93,7 +96,7 @@ class FileManager:
 
                     # check if it is already in the list
                     already_in_list = existing_job_with_same_id_in_memory(
-                        queue_list, allocation_size, job_to_add.id)
+                        queue_list, job_to_add.id)
 
                     if (already_in_list):
                         deallocate_memory(
@@ -112,6 +115,8 @@ class FileManager:
                     self.allocate_job_in_memory(queue_list, time_manager.get_elapsed_time(
                     ), list_number, next_memory_address, job_to_add)
                     jobs_list.pop(0)
+
+                # I THINK WE CAN INCLUDE IT HERE
 
                 self.check_jobs_in_memory_status(
                     queue_list, time_manager.get_elapsed_time(), list_number)
@@ -157,75 +162,55 @@ class FileManager:
             except:
                 return
 
-    def show_allocation_for_file(self, file_number: int,
-                                 #  queue_list: list[None | MemoryFragment]
-                                 ):
+    def show_allocation_for_file(
+        self, file_number: int,
+        list_number: int,
+        elapsed_time: float,
+        queue_list: list[None | MemoryFragment]
+    ) -> None:
+        # read the file information
         self.read_file(file_number)
-
-        memory_map: dict[str, (PageTable | None)] = {
-            "1": PageTable("1", [0, 2, 3, 5]),
-            "2": PageTable("2", [7, 8, 9, 10]),
-            "3": PageTable("3", [11, 12, 13]),
-            "4": PageTable("4", [14, 15]),
-            "5": PageTable("5", [16, 18, 19]),
-        }
-        queue_list: list[None | MemoryFragment] = [
-            None for _ in range(NUMBER_OF_PAGES)]
-        queue_list[0] = MemoryFragment("1", "2", "4", "4", "Sleep")
-        queue_list[0].current_state = "Running"
-        queue_list[2] = MemoryFragment("1", "2", "4", "4", "Sleep")
-        queue_list[2].current_state = "Running"
-        queue_list[3] = MemoryFragment("1", "2", "4", "4", "Sleep")
-        queue_list[3].current_state = "Running"
-        queue_list[5] = MemoryFragment("1", "2", "4", "4", "Sleep")
-        queue_list[5].current_state = "Running"
-
-        queue_list[7] = MemoryFragment("2", "2", "4", "4", "Sleep")
-        queue_list[7].current_state = "Running"
-        queue_list[8] = MemoryFragment("2", "2", "4", "4", "Sleep")
-        queue_list[8].current_state = "Running"
-        queue_list[9] = MemoryFragment("2", "2", "4", "4", "Sleep")
-        queue_list[9].current_state = "Running"
-        queue_list[10] = MemoryFragment("2", "2", "4", "4", "Sleep")
-        queue_list[10].current_state = "Running"
-
-        queue_list[11] = MemoryFragment("3", "2", "4", "4", "Sleep")
-        queue_list[11].current_state = "Sleep"
-        queue_list[12] = MemoryFragment("3", "2", "4", "4", "Sleep")
-        queue_list[12].current_state = "Sleep"
-        queue_list[13] = MemoryFragment("3", "2", "4", "4", "Sleep")
-        queue_list[13].current_state = "Sleep"
-
-        queue_list[14] = MemoryFragment("4", "2", "4", "4", "Sleep")
-        queue_list[14].current_state = "Running"
-        queue_list[15] = MemoryFragment("4", "2", "4", "4", "Sleep")
-        queue_list[15].current_state = "Running"
-
-        queue_list[16] = MemoryFragment("5", "2", "4", "4", "Sleep")
-        queue_list[16].current_state = "Pending"
-        queue_list[19] = MemoryFragment("5", "2", "4", "4", "Sleep")
-        queue_list[19].current_state = "Pending"
-        queue_list[18] = MemoryFragment("5", "2", "4", "4", "Sleep")
-        queue_list[18].current_state = "Pending"
-
-        print("queue_list")
-        json_stringify(queue_list)
-        print("memory_map")
-        json_stringify(memory_map)
-
+        # creation of new memory fragments from file fragments
+        head = self.files[file_number].file_fragments.head
+        memory_fragment: MemoryFragment
         allocation_size: int = math.ceil(self.files[file_number].size)
-        allocation_indexes, pending_indexes = search_for_page_indexes(
-            queue_list, memory_map, 12)
-        print_separation()
-        print('After ALLOCATING SPACE')
-        print("allocation_indexes")
-        json_stringify(allocation_indexes)
-        print("pending_indexes")
-        json_stringify(pending_indexes)
-        print("queue_list")
-        json_stringify(queue_list)
-        print("memory_map")
-        json_stringify(memory_map)
+        already_in_list = False
+        if head is not None:
+            memory_fragment = MemoryFragment(
+                head.data.metadata,
+                str(float_to_int(self.files[file_number].allocation_time)),
+                str(allocation_size),
+                str(float_to_int(self.files[file_number].deallocation_time -
+                                 self.files[list_number].allocation_time)),
+                "End"
+            )
+            # check if it is already in the list
+            already_in_list = existing_job_with_same_id_in_memory(
+                queue_list, memory_fragment.id)
+
+            if (already_in_list):
+                deallocate_memory(
+                    queue_list, self.memory_maps[list_number], memory_fragment.id)
+
+        memory_map = self.memory_maps[list_number]
+
+        allocation_indexes, pending_memory_fragments = search_for_page_indexes(
+            queue_list, memory_map, allocation_size)
+
+        if len(allocation_indexes) < allocation_size:
+            print(
+                "The file that you tried to open couldn't be loaded into the the memory because there are jobs with higher priority executing, consider getting more RAM or more virtual memory")
+            return
+
+        if memory_fragment is not None:
+            self.allocate_file_in_memory(
+                queue_list, list_number, elapsed_time, allocation_indexes, memory_fragment)
+
+        jobs_list = self.memory_data_list[list_number]
+        if jobs_list is not None:
+            jobs_list = [*jobs_list, *pending_memory_fragments]
+
+        self.check_memory_maps(list_number)
 
     def check_jobs_in_memory_status(self, queue_list: list[MemoryFragment | None], elapsed_time: float, list_number: int) -> None:
         found_job_id: str = "-1"
@@ -268,7 +253,7 @@ class FileManager:
             return
         # setting new start time for job that didn't start at the expected time
         if int(job_to_add.start_time) < elapsed_time:
-            job_to_add.start_time = f"{int(round(elapsed_time))}"
+            job_to_add.start_time = f"{float_to_int(elapsed_time)}"
         # setting the memory fragments into memory
         index_range = start_index, start_index + allocation_size
         for i in range(*index_range):
@@ -285,13 +270,13 @@ class FileManager:
         self,
         queue_list: list[MemoryFragment | None],
         list_number: int,
-        elapsed_time: int,
+        elapsed_time: float,
         indexes: list[int],
         file_to_add: MemoryFragment
     ):
         # setting new start time for job that didn't start at the expected time
         if int(file_to_add.start_time) < elapsed_time:
-            file_to_add.start_time = f"{int(round(elapsed_time))}"
+            file_to_add.start_time = f"{float_to_int(elapsed_time)}"
         for index in indexes:
             queue_list[index] = file_to_add
             # simulates that it is a hexadecimal location

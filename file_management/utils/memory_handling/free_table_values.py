@@ -1,4 +1,5 @@
 from models.page_table import PageTable
+# from utils.debugger import json_stringify
 from utils.from_decimal_to_hexadecimal import from_decimal_to_hexadecimal
 from utils.text_utils import print_red
 
@@ -16,3 +17,8 @@ def free_table_values(memory_map: dict[str, PageTable | None], memory_indexes: l
 
             if len(new_addresses) == 0:
                 memory_map[key] = None
+
+            else:
+                page_table = memory_map[key]
+                if page_table is not None:
+                    page_table.memory_addresses = new_addresses

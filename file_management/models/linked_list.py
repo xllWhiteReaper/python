@@ -47,3 +47,9 @@ class LinkedList(Generic[T]):
             node_values.append(str(current_node.data))
             current_node = current_node.next_node
         return " -> ".join(node_values)
+
+    def __iter__(self):
+        current = self.head
+        while current is not None:
+            yield current.data
+            current = current.next_node

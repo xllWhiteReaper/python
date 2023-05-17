@@ -1,5 +1,6 @@
 from models.memory_fragment import MemoryFragment
 from models.page_table import PageTable
+# from utils.debugger import json_stringify
 from utils.memory_handling.free_memory_space import POSSIBLE_STATUSES_TO_BE_DEALLOCATED
 from utils.memory_handling.free_queue_list import free_queue_list
 from utils.memory_handling.free_table_values import free_table_values
@@ -30,6 +31,7 @@ def free_memory_space_for_files(
 
         # Update the tables
         free_queue_list(queue_list, freed_indexes)
+
         free_table_values(
             memory_map, freed_indexes)
 
