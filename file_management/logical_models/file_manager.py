@@ -64,10 +64,7 @@ class FileManager:
         except:
             return
 
-    def show_os_simulation(self, list_number: int = 0) -> None:
-        self.queue_with_specific_fit_approach(list_number, "best")
-
-    def queue_with_specific_fit_approach(self, list_number: int, queue_type: str) -> None:
+    def queue_with_specific_fit_approach(self, file_number: int, list_number: int, queue_type: str) -> None:
         time_manager = TimeManager()
         print_n_new_lines(2)
         print_centered_text(
@@ -79,8 +76,18 @@ class FileManager:
             None for _ in range(NUMBER_OF_PAGES)]
         jobs_list = self.memory_data_list[list_number]
 
+        # FILE RELATED STUFF
+        already_loaded_file_to_memory = False
+        # read the file information
+        self.read_file(file_number)
+        file: File = self.files[file_number]
+        print(f"File allocation time: {round(file.allocation_time, 2)}")
+        # FILE RELATED STUFF
+
         if jobs_list is not None:
             while len(jobs_list) > 0 or self.jobs_still_running(queue_list):
+                print(
+                    f"Current elapsed time: {time_manager.get_elapsed_time()}")
                 print_separation()
                 jobs_list = self.memory_data_list[list_number]
                 job_to_add: MemoryFragment | None
@@ -116,7 +123,15 @@ class FileManager:
                     ), list_number, next_memory_address, job_to_add)
                     jobs_list.pop(0)
 
-                # I THINK WE CAN INCLUDE IT HERE
+                # ALLOCATING THE FILE INTO MEMORY
+                if file.allocation_time <= time_manager.get_elapsed_time() and not already_loaded_file_to_memory:
+                    self.show_allocation_for_file(
+                        file_number,
+                        list_number,
+                        time_manager.get_elapsed_time(),
+                        queue_list,
+                    )
+                    already_loaded_file_to_memory = True
 
                 self.check_jobs_in_memory_status(
                     queue_list, time_manager.get_elapsed_time(), list_number)
@@ -135,10 +150,11 @@ class FileManager:
         self.memory_maps[list_number] = {
             key: value for key, value in self.memory_maps[list_number].items() if value is not None}
 
-    def queue_handler(self, list_number: int, queue_type: str):
+    def queue_handler(self, file_number: int, list_number: int, queue_type: str):
         try:
             self.get_jobs_from_n_list(list_number)
-            self.queue_with_specific_fit_approach(list_number, queue_type)
+            self.queue_with_specific_fit_approach(
+                file_number, list_number, queue_type)
         except:
             return
 
@@ -163,13 +179,12 @@ class FileManager:
                 return
 
     def show_allocation_for_file(
-        self, file_number: int,
+        self,
+        file_number: int,
         list_number: int,
         elapsed_time: float,
         queue_list: list[None | MemoryFragment]
     ) -> None:
-        # read the file information
-        self.read_file(file_number)
         # creation of new memory fragments from file fragments
         head = self.files[file_number].file_fragments.head
         memory_fragment: MemoryFragment

@@ -2,19 +2,15 @@ import time
 from utils.text_utils import print_centered_text, print_red,\
     print_separation, print_n_new_lines
 
-from logical_models.file_manager import FileManager
+from logical_models.file_manager import MEMORY_DATA_PATHS, FileManager
 from logical_models.file_manager import FILE_DATA_PATHS
 
 POSSIBLE_ANSWERS = [
-    "-1", *[str(i + 1) for i in range(len(FILE_DATA_PATHS))]
+    "-1", *[str(i + 1)
+            for i in range(len(FILE_DATA_PATHS)*len(MEMORY_DATA_PATHS))]
 ]
 ACTIONS = {
-    "1": (0, "best"),
-    "2": (0, "first"),
-    "3": (0, "worst"),
-    "4": (1, "best"),
-    "5": (1, "first"),
-    "6": (1, "worst"),
+    "1": (0, 0, "best"),
 }
 
 
@@ -45,5 +41,5 @@ class Menu:
 
             else:
                 print("well done!")
-                self.file_manager.show_allocation_for_file(int(option)-1, 0, 6)
+                self.file_manager.queue_handler(*ACTIONS[option])
                 time.sleep(0.2)
