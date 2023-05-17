@@ -138,7 +138,6 @@ class FileManager:
             return
 
     def read_file(self, file_number: int) -> None:
-        print("IN READ FILE")
         if file_number >= len(FILE_DATA_PATHS):
             return
         file_name = FILE_DATA_PATHS[file_number]
@@ -157,26 +156,76 @@ class FileManager:
                     *[FileBlock(meta_data) for meta_data in memory_blocks_string.split("-")])
             except:
                 return
+
+    def show_allocation_for_file(self, file_number: int,
+                                 #  queue_list: list[None | MemoryFragment]
+                                 ):
+        self.read_file(file_number)
+
+        memory_map: dict[str, (PageTable | None)] = {
+            "1": PageTable("1", [0, 2, 3, 5]),
+            "2": PageTable("2", [7, 8, 9, 10]),
+            "3": PageTable("3", [11, 12, 13]),
+            "4": PageTable("4", [14, 15]),
+            "5": PageTable("5", [16, 18, 19]),
+        }
         queue_list: list[None | MemoryFragment] = [
             None for _ in range(NUMBER_OF_PAGES)]
         queue_list[0] = MemoryFragment("1", "2", "4", "4", "Sleep")
-        queue_list[0].current_state = "Sleep"
-
+        queue_list[0].current_state = "Running"
         queue_list[2] = MemoryFragment("1", "2", "4", "4", "Sleep")
         queue_list[2].current_state = "Running"
         queue_list[3] = MemoryFragment("1", "2", "4", "4", "Sleep")
         queue_list[3].current_state = "Running"
         queue_list[5] = MemoryFragment("1", "2", "4", "4", "Sleep")
         queue_list[5].current_state = "Running"
-        queue_list[9] = MemoryFragment("1", "2", "4", "4", "Sleep")
-        queue_list[9].current_state = "Running"
-        queue_list[18] = MemoryFragment("1", "2", "4", "4", "Sleep")
-        queue_list[18].current_state = "Running"
-        print("Searching for indexes")
-        json_stringify(search_for_page_indexes(queue_list, 8))
 
-    def show_allocation_for_file(self, file_number: int):
-        pass
+        queue_list[7] = MemoryFragment("2", "2", "4", "4", "Sleep")
+        queue_list[7].current_state = "Running"
+        queue_list[8] = MemoryFragment("2", "2", "4", "4", "Sleep")
+        queue_list[8].current_state = "Running"
+        queue_list[9] = MemoryFragment("2", "2", "4", "4", "Sleep")
+        queue_list[9].current_state = "Running"
+        queue_list[10] = MemoryFragment("2", "2", "4", "4", "Sleep")
+        queue_list[10].current_state = "Running"
+
+        queue_list[11] = MemoryFragment("3", "2", "4", "4", "Sleep")
+        queue_list[11].current_state = "Sleep"
+        queue_list[12] = MemoryFragment("3", "2", "4", "4", "Sleep")
+        queue_list[12].current_state = "Sleep"
+        queue_list[13] = MemoryFragment("3", "2", "4", "4", "Sleep")
+        queue_list[13].current_state = "Sleep"
+
+        queue_list[14] = MemoryFragment("4", "2", "4", "4", "Sleep")
+        queue_list[14].current_state = "Running"
+        queue_list[15] = MemoryFragment("4", "2", "4", "4", "Sleep")
+        queue_list[15].current_state = "Running"
+
+        queue_list[16] = MemoryFragment("5", "2", "4", "4", "Sleep")
+        queue_list[16].current_state = "Pending"
+        queue_list[19] = MemoryFragment("5", "2", "4", "4", "Sleep")
+        queue_list[19].current_state = "Pending"
+        queue_list[18] = MemoryFragment("5", "2", "4", "4", "Sleep")
+        queue_list[18].current_state = "Pending"
+
+        print("queue_list")
+        json_stringify(queue_list)
+        print("memory_map")
+        json_stringify(memory_map)
+
+        allocation_size: int = math.ceil(self.files[file_number].size)
+        allocation_indexes, pending_indexes = search_for_page_indexes(
+            queue_list, memory_map, 12)
+        print_separation()
+        print('After ALLOCATING SPACE')
+        print("allocation_indexes")
+        json_stringify(allocation_indexes)
+        print("pending_indexes")
+        json_stringify(pending_indexes)
+        print("queue_list")
+        json_stringify(queue_list)
+        print("memory_map")
+        json_stringify(memory_map)
 
     def check_jobs_in_memory_status(self, queue_list: list[MemoryFragment | None], elapsed_time: float, list_number: int) -> None:
         found_job_id: str = "-1"
