@@ -10,7 +10,7 @@ To test new scenarios, users must add files to the "data" folder, provide paths 
 
 - Simulate allocation of a file to memory (RAM)
 - Object Oriented Programming
-- Custom and complex data structures
+- Custom and complex data structures including Linked Lists
 - Ability to add additional files for simulation
 - Several utilities for task distribution and debugging
 

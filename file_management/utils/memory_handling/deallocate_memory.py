@@ -5,6 +5,7 @@ from utils.memory_handling.free_table_values import free_table_values
 
 
 def deallocate_memory(queue_list: list[MemoryFragment | None], memory_map: dict[str, PageTable | None], job_id: str):
+    # deallocates memory for a target job_id, without the need to search for indexes
     MEMORY_TABLE = memory_map.get(job_id)
     if MEMORY_TABLE is not None:
         free_queue_list(queue_list, MEMORY_TABLE.memory_addresses)

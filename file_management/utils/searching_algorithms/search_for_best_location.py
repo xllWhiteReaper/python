@@ -7,6 +7,8 @@ def search_for_best_location(queue_list: list[MemoryFragment | None], target_mem
     first_index: int = -1
     index: int = -1
     possible_index: int = -1
+    # searches for the exact amount of continuous None inside the queue list,
+    # if not, tries to return the first fit, else, returns -1
     for idx, job_fragment in enumerate(queue_list):
 
         if job_fragment is None:

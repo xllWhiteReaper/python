@@ -12,6 +12,8 @@ def free_memory_space_for_files(
     target_memory: int,
     available_indexes: list[int]
 ) -> tuple[list[int], list[MemoryFragment]]:
+    # searches for spaces to deallocate, if it gets to the target memory, it deallocates those memory
+    # addresses, else, it just returns the ones it found
     freed_indexes: list[int] = [*available_indexes]
     pending_jobs: list[MemoryFragment] = []
 

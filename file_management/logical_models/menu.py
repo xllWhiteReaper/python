@@ -40,6 +40,5 @@ class Menu:
                 break
 
             else:
-                print("well done!")
                 self.file_manager.queue_handler(*ACTIONS[option])
                 time.sleep(0.2)

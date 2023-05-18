@@ -10,19 +10,15 @@ from utils.float_to_int import float_to_int
 from utils.from_decimal_to_hexadecimal import from_decimal_to_hexadecimal
 from utils.memory_handling.deallocate_memory import deallocate_memory
 from utils.memory_handling.free_memory_space import free_memory_space
-from utils.memory_handling.free_queue_list import free_queue_list
-from utils.memory_handling.free_table_values import free_table_values
 from utils.memory_handling.search_for_available_space import search_for_available_space
 from utils.existing_job_with_same_id_in_memory import existing_job_with_same_id_in_memory
 from utils.searching_algorithms.search_for_page_indexes import search_for_page_indexes
 from utils.text_utils import print_aqua, print_centered_text, print_green,\
     print_separation, print_n_new_lines, print_yellow
-from utils.debugger import json_stringify
+# from utils.debugger import json_stringify
 from utils.time_manager import TimeManager
 
 DISK_BLOCK_SIZE = 1
-
-
 PAGE_SIZE = 1
 REAL_EXECUTION_TIME = 0.01
 TOTAL_MEMORY_SIZE = 20
@@ -81,13 +77,10 @@ class FileManager:
         # read the file information
         self.read_file(file_number)
         file: File = self.files[file_number]
-        print(f"File allocation time: {round(file.allocation_time, 2)}")
         # FILE RELATED STUFF
 
         if jobs_list is not None:
             while len(jobs_list) > 0 or self.jobs_still_running(queue_list):
-                print(
-                    f"Current elapsed time: {time_manager.get_elapsed_time()}")
                 print_separation()
                 jobs_list = self.memory_data_list[list_number]
                 job_to_add: MemoryFragment | None
@@ -109,16 +102,19 @@ class FileManager:
                         deallocate_memory(
                             queue_list, self.memory_maps[list_number], job_to_add.id)
 
+                    # searches for memory addresses that are available
                     next_memory_address = search_for_available_space(
                         queue_list, queue_type, allocation_size)
 
                 if next_memory_address == -1 and jobs_list is not None:
+                    # deallocate if didn't find a block
                     next_memory_address, pending_jobs = free_memory_space(
                         queue_list, self.memory_maps[list_number], allocation_size)
                     [jobs_list.append(job) for job in pending_jobs]
                     self.check_memory_maps(list_number)
 
                 if next_memory_address > -1 and job_to_add is not None and jobs_list is not None:
+                    # allocates if there is enough space and running task aren't thrown away
                     self.allocate_job_in_memory(queue_list, time_manager.get_elapsed_time(
                     ), list_number, next_memory_address, job_to_add)
                     jobs_list.pop(0)
@@ -173,6 +169,8 @@ class FileManager:
                     allocation_time)
                 self.files[file_number].deallocation_time = float(
                     deallocation_time)
+                # this is the form to separate the memory block ids just because of the way
+                # the csv is saved
                 self.files[file_number].append(
                     *[FileBlock(meta_data) for meta_data in memory_blocks_string.split("-")])
             except:
@@ -228,17 +226,15 @@ class FileManager:
         self.check_memory_maps(list_number)
 
     def check_jobs_in_memory_status(self, queue_list: list[MemoryFragment | None], elapsed_time: float, list_number: int) -> None:
+        # logs into the console the statuses of the jobs, and also sets some depending on the condition
         found_job_id: str = "-1"
         for queued_job in queue_list:
             if queued_job is not None and queued_job.id != found_job_id:
                 try:
                     if elapsed_time >= int(queued_job.start_time) and queued_job.current_state == "Pending":
-                        # Add color green
                         print_aqua(
                             f"Job with id {queued_job.id} has started running")
                         queued_job.current_state = "Running"
-                    # Supposing that the csv schema is adequate and every task will start its
-                    # execution at the estated time
                     elif elapsed_time >= int(queued_job.start_time) + int(queued_job.execution_interval):
                         print_green(
                             f"Job with id {queued_job.id} has finished its execution interval")
@@ -261,7 +257,6 @@ class FileManager:
                         f"Job with id {queued_job.id} is running")
 
     def allocate_job_in_memory(self, queue_list: list[MemoryFragment | None], elapsed_time: float, list_number: int, start_index: int, job_to_add: MemoryFragment):
-        # we will consider that the indexes of allocation are continuos
         try:
             allocation_size = int(math.floor(int(job_to_add.required_size))/2)
         except:

@@ -30,9 +30,6 @@ def free_memory_space(queue_list: list[JobFragment | None], memory_map: dict[str
 
     if index != -1:
         # Add pending jobs to a list so that we can put them back to the jobs list
-        for job_fragment in queue_list[index: index + counter]:
-            if job_fragment is not None and job_fragment.current_state == "Pending":
-                pass
         pending_jobs = [job_fragment for job_fragment in queue_list[index: index + counter]
                         if job_fragment is not None and job_fragment.current_state == "Pending" and
                         job_fragment.id not in [job.id for job in pending_jobs]]

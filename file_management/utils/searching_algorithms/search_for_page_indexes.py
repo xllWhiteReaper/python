@@ -10,12 +10,15 @@ def search_for_page_indexes(
 ) -> tuple[list[int], list[MemoryFragment]]:
     pending_jobs: list[MemoryFragment] = []
     available_indexes: list[int] = []
+
+    # checks the fragments inside the queue list and searches for free (None) spaces
     for idx, job_fragment in enumerate(queue_list):
         if len(available_indexes) == target_memory:
             break
         if job_fragment is None:
             available_indexes.append(idx)
 
+    # if it doesn't reach the target_memory, it calls the free_memory function
     if len(available_indexes) < target_memory:
         return free_memory_space_for_files(queue_list, memory_map, target_memory, available_indexes)
 

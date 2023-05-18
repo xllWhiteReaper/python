@@ -14,10 +14,9 @@ class File:
     def calculate_file_size(self) -> None:
         self.size = 0
         head: Node[FileBlock] | None = self.file_fragments.head
-        if head is not None:
-            while head is not None:
-                self.size += head.data.size
-                head = head.next_node
+        while head is not None:
+            self.size += head.data.size
+            head = head.next_node
 
     def append(self, *elements: FileBlock) -> None:
         for element in elements:
